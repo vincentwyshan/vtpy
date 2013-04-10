@@ -4,20 +4,19 @@ import os
 from setuptools import setup, find_packages
 
 
-setup(name='prettyprint',
+setup(name='test',
       version='0.0',
-      description='prettyprint',
-      long_description="vincent's prettyprint",
+      description='test',
+      long_description="vincent's python toolkit",
       author='',
       author_email='',
       url='',
-      keywords='prettyprint',
+      keywords='test',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      namespace_packages=['vincent'],
-      test_suite='prettyprint',
       install_requires=[],
-      scripts=[]
+      scripts=[],
+      namespace_packages=['vincent']
       )
 
