@@ -5,7 +5,9 @@ _print_err(a, b, c)
 
 import sys
 import os
+import codecs
 import datetime
+import logging
 
 
 def _str(val, encoding):
@@ -13,6 +15,12 @@ def _str(val, encoding):
     if isinstance(val, unicode):
         return val.encode(encoding)
     return str(val)
+
+def _unicode(val, encoding):
+    if isinstance(val, str):
+        return val.decode(encoding)
+    return unicode(val)
+
 
 def _print(*args):
     "print regular..."
@@ -49,19 +57,19 @@ def _print_err(*args):
     print BCOLORS.FAIL + '[%s]' % str(datetime.datetime.now()), prefix, \
             ' '.join(args) + BCOLORS.ENDC
             
-def logprint(logname, category, level=logging.DEBUG, maxBytes=1024*10124*100,
-             backupCount=0, to_stdout=True):
+def logprint(logname, category, level=logging.DEBUG, max_bytes=1024*10124*100,
+             backup_count=0, to_stdout=True, base_dir='.'):
     """category could be 'category', also 'category/subcategory. It's part of\
  path."""
-    from cada.common.log import logger
-    path = os.path.join(settings.CADA_LOG_DIR, category, logname+'.log')
+    path = os.path.join(base_dir, category, logname+'.log')
 
     # Initialize logger
     logger = logging.getLogger(logname)
     frt = logging.Formatter('%(message)s')
     hdr = None
     if path:
-        hdr = logging.handlers.RotatingFileHandler(path, 'a', maxBytes, backupCount, 'utf-8')
+        hdr = logging.handlers.RotatingFileHandler(path, 'a', max_bytes,
+                                                   backup_count, 'utf-8')
         hdr.setFormatter(frt)
         logger.addHandler(hdr)
     if to_stdout:
@@ -71,12 +79,10 @@ def logprint(logname, category, level=logging.DEBUG, maxBytes=1024*10124*100,
     logger.setLevel(level)
     
     def _wraper(*args):
-        if not settings.DEBUG:
-            return
         if not args:
             return
         encoding = 'utf8' if os.name == 'posix' else 'gbk'
-        args = [_cu(a, encoding) for a in args]
+        args = [_unicode(a, encoding) for a in args]
         f_back = None
         try:
             raise Exception
@@ -86,8 +92,8 @@ def logprint(logname, category, level=logging.DEBUG, maxBytes=1024*10124*100,
         filename = os.path.basename(f_back.f_code.co_filename)
         m_name = os.path.splitext(filename)[0]
         prefix = (u'[%s.%s]' % (m_name, f_name)).ljust(20, ' ')
-        logger.info(u' '.join([u'[%s]'%unicode(datetime.datetime.now()), prefix, 
-                     ' '.join(args)]))
+        logger.info(u' '.join([u'[%s]'%unicode(datetime.datetime.now()), prefix,
+                               ' '.join(args)]))
     return _wraper, logger
             
 
