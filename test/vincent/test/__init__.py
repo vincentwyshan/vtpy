@@ -1,3 +1,2 @@
-
-def run():
-    print 'test'
+#coding=utf8
+#TODO Have some test snippet, which might be put here.
